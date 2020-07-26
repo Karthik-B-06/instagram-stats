@@ -89,48 +89,52 @@ const body = ({ full_name, profile_pic_url_hd, biography, followersCount }) => {
 };
 
 module.exports = async (req, res) => {
-  const {
-    instaId
-  } = req?.query;
-  if (instaId) {
-    const url = `https://www.instagram.com/${instaId}/?__a=1`;
-    axios({
-      method: 'GET',
-      url,
-    }).then((response) => {
-      try {
-        const {
-          graphql: {
-            user: {
-              full_name,
-              biography,
-              edge_follow: {
-                count: followCount
-              },
-              edge_followed_by: {
-                count: followersCount
-              },
-              profile_pic_url_hd,
-              username
+  return new Promise(resolve => {
+    const {
+      instaId
+    } = req?.query;
+    if (instaId) {
+      const url = `https://www.instagram.com/${instaId}/?__a=1`;
+      axios({ method: 'GET', url }).then((response) => {
+        console.log(response, "Response");
+        try {
+          const {
+            graphql: {
+              user: {
+                full_name,
+                biography,
+                edge_follow: {
+                  count: followCount
+                },
+                edge_followed_by: {
+                  count: followersCount
+                },
+                profile_pic_url_hd,
+                username
+              }
             }
-          }
-
-        } = response?.data;
-        res.send(`<html lang="en">
-                      ${styles}
-                      ${body({ full_name, biography, followersCount, profile_pic_url_hd, username })}
-                  </html>`
-        )
-      } catch (e) {
+          } = response?.data;
+          res.send(`<html lang="en">
+                    ${styles}
+                    ${body({ full_name, biography, followersCount, profile_pic_url_hd, username })}
+                </html>`
+          );
+          return resolve();
+        } catch (e) {
+          console.warn(e);
+          res.send('<html> <p>Invalid username!</p> </html>');
+          return resolve();
+        }
+      }).catch(e => {
         console.warn(e);
-        res.send('<html> <p>Invalid username!</p> </html>')
-      }
-    }).catch(e => {
-      console.warn(e);
-      res.send('<html> <p>Invalid username!</p> </html>')
-    });
-  }
-  else {
-    res.send('<html> <p>Username undefined!</p> </html>')
-  }
+        res.send('<html> <p>Server Error, Raise an Issue!</p> </html>');
+        return resolve();
+      });
+
+    }
+    else {
+      res.send('<html> <p>Username undefined!</p> </html>');
+      return resolve();
+    }
+  })
 }
