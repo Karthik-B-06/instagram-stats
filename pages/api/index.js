@@ -99,6 +99,7 @@ module.exports = async (req, res) => {
       url,
     });
     try {
+      console.log(data.data.graphql)
       const {
         data: {
           graphql: {
@@ -118,9 +119,10 @@ module.exports = async (req, res) => {
         }
       } = data;
       res.send(`<html lang="en">
-      ${styles}
-      ${body({ full_name, biography, followersCount, profile_pic_url_hd, username })}
-    </html>`)
+                    ${styles}
+                    ${body({ full_name, biography, followersCount, profile_pic_url_hd, username })}
+                </html>`
+      )
     } catch (e) {
       console.warn(e);
       res.send('<html> <p>Invalid username!</p> </html>')
