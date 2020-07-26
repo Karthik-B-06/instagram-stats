@@ -96,12 +96,14 @@ module.exports = async (req, res) => {
     if (instaId) {
       const url = `https://www.instagram.com/${instaId}/?__a=1`;
       axios({
-        method: 'GET', url, headers: {
+        method: 'GET',
+        url, headers:
+        {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Credentials': true,
         }
       }).then((response) => {
-        console.log(response, "Response");
+        console.log(response.data, "Response");
         try {
           const {
             graphql: {
