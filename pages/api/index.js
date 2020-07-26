@@ -33,6 +33,15 @@ const styles = `
 p {
   margin: 0px;
   padding: 0px;
+  font-weight: 300;
+  font-size: 14px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+h5 {
+  margin: 0px;
+  padding-bottom: 6px;
+  font-weight: 400;
+  font-size: 18px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 .icon {
@@ -59,10 +68,10 @@ const body = ({ full_name, profile_pic_url_hd, biography, followersCount }) => {
       src=${profile_pic_url_hd}
     />
     <div class="user-detail">
-      <p>${full_name}</p>
-      <span>
+      <h5>${full_name}</h5>
+      <p>
         ${biography}
-      </span>
+      </p>
     </div>
   </div>
   <div class="card-bottom">
@@ -113,6 +122,7 @@ module.exports = async (req, res) => {
       ${body({ full_name, biography, followersCount, profile_pic_url_hd, username })}
     </html>`)
     } catch (e) {
+      console.warn(e);
       res.send('<html> <p>Invalid username!</p> </html>')
     }
   }
