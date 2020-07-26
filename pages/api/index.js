@@ -103,7 +103,7 @@ module.exports = async (req, res) => {
           'Access-Control-Allow-Credentials': true,
         }
       }).then((response) => {
-        console.log(response.data, "Response");
+        console.log(response.data.data, "Response");
         try {
           const {
             graphql: {
