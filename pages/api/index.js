@@ -95,7 +95,12 @@ module.exports = async (req, res) => {
     } = req?.query;
     if (instaId) {
       const url = `https://www.instagram.com/${instaId}/?__a=1`;
-      axios({ method: 'GET', url }).then((response) => {
+      axios({
+        method: 'GET', url, headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': true,
+        }
+      }).then((response) => {
         console.log(response, "Response");
         try {
           const {
