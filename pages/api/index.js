@@ -1,0 +1,122 @@
+import axios from 'axios';
+
+const styles = `
+<style>
+.container {
+  height: 150px;
+  width: 400px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+}
+.card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-content: center;
+  padding-bottom: 10px;
+}
+.avatar {
+  height: 100px;
+  width: 100px;
+}
+.user-detail {
+  padding-left: 10px;
+}
+.card-bottom {
+  padding-top: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-top: 1px solid #cccccc;
+}
+p {
+  margin: 0px;
+  padding: 0px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+.icon {
+  height: 16px;
+  width: 16px;
+}
+.link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+</style>
+`;
+
+const body = ({ full_name, profile_pic_url_hd, biography, followersCount }) => {
+  return (
+    `
+<body>
+<div class="container">
+  <div style="border-width:10px;" class="card">
+    <img
+      class="avatar"
+      style="border-radius: 10px;"
+      src=${profile_pic_url_hd}
+    />
+    <div class="user-detail">
+      <p>${full_name}</p>
+      <span>
+        ${biography}
+      </span>
+    </div>
+  </div>
+  <div class="card-bottom">
+    <p>${followersCount} Followers</p>
+    <a class="link"><p>View</p>
+    <img
+      class="icon"
+      src="https://img.icons8.com/ios-glyphs/30/000000/chevron-right.png"
+    />
+  </a>
+  </div>
+</div>
+</body>`
+  )
+};
+
+module.exports = async (req, res) => {
+  const {
+    instaId
+  } = req?.query;
+  if (instaId) {
+    const url = `https://www.instagram.com/${instaId}/?__a=1`;
+    const data = await axios({
+      method: 'GET',
+      url,
+    });
+    try {
+      const {
+        data: {
+          graphql: {
+            user: {
+              full_name,
+              biography,
+              edge_follow: {
+                count: followCount
+              },
+              edge_followed_by: {
+                count: followersCount
+              },
+              profile_pic_url_hd,
+              username
+            }
+          }
+        }
+      } = data;
+      res.send(`<html lang="en">
+      ${styles}
+      ${body({ full_name, biography, followersCount, profile_pic_url_hd, username })}
+    </html>`)
+    } catch (e) {
+      res.send('<html> <p>Invalid username!</p> </html>')
+    }
+  }
+  else {
+    res.send('<html> <p>Username undefined!</p> </html>')
+  }
+}
