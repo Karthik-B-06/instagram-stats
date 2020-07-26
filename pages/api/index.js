@@ -94,14 +94,12 @@ module.exports = async (req, res) => {
   } = req?.query;
   if (instaId) {
     const url = `https://www.instagram.com/${instaId}/?__a=1`;
-    const data = await axios({
+    axios({
       method: 'GET',
       url,
-    });
-    try {
-      console.log(data.data.graphql)
-      const {
-        data: {
+    }).then((response) => {
+      try {
+        const {
           graphql: {
             user: {
               full_name,
@@ -116,17 +114,21 @@ module.exports = async (req, res) => {
               username
             }
           }
-        }
-      } = data;
-      res.send(`<html lang="en">
-                    ${styles}
-                    ${body({ full_name, biography, followersCount, profile_pic_url_hd, username })}
-                </html>`
-      )
-    } catch (e) {
+
+        } = response?.data;
+        res.send(`<html lang="en">
+                      ${styles}
+                      ${body({ full_name, biography, followersCount, profile_pic_url_hd, username })}
+                  </html>`
+        )
+      } catch (e) {
+        console.warn(e);
+        res.send('<html> <p>Invalid username!</p> </html>')
+      }
+    }).catch(e => {
       console.warn(e);
       res.send('<html> <p>Invalid username!</p> </html>')
-    }
+    });
   }
   else {
     res.send('<html> <p>Username undefined!</p> </html>')
