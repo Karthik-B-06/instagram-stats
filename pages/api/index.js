@@ -129,7 +129,7 @@ module.exports = async (req, res) => {
           return resolve();
         } catch (e) {
           console.warn(e);
-          res.send('<html> <p>Invalid username!</p> </html>');
+          res.send(`<html> <p>Invalid username!</p> ${JSON.stringify(e)} </html>`);
           return resolve();
         }
       }).catch(e => {
