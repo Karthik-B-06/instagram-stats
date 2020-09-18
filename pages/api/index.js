@@ -1,9 +1,8 @@
-import axios from 'axios';
+import axios from "axios";
 
 const styles = `
 <style>
 .container {
-  height: 150px;
   width: 400px;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -57,8 +56,7 @@ h5 {
 `;
 
 const body = ({ full_name, profile_pic_url_hd, biography, followersCount }) => {
-  return (
-    `
+  return `
 <body>
 <div class="container">
   <div style="border-width:10px;" class="card">
@@ -69,9 +67,7 @@ const body = ({ full_name, profile_pic_url_hd, biography, followersCount }) => {
     />
     <div class="user-detail">
       <h5>${full_name}</h5>
-      <p>
-        ${biography}
-      </p>
+      <span style="white-space: pre-line">${biography}</span>
     </div>
   </div>
   <div class="card-bottom">
@@ -84,64 +80,64 @@ const body = ({ full_name, profile_pic_url_hd, biography, followersCount }) => {
   </a>
   </div>
 </div>
-</body>`
-  )
+</body>`;
 };
 
 module.exports = async (req, res) => {
-  return new Promise(resolve => {
-    const {
-      instaId
-    } = req?.query;
+  return new Promise((resolve) => {
+    const { instaId } = req?.query;
     if (instaId) {
       const url = `https://www.instagram.com/${instaId}/?__a=1`;
       axios({
-        method: 'GET',
-        url, headers:
-        {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Credentials': true,
-        }
-      }).then((response) => {
-        console.log(response.data, "Response");
-        try {
-          const {
-            graphql: {
-              user: {
-                full_name,
-                biography,
-                edge_follow: {
-                  count: followCount
+        method: "GET",
+        url,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+        },
+      })
+        .then((response) => {
+          try {
+            const {
+              graphql: {
+                user: {
+                  full_name,
+                  biography,
+                  edge_follow: { count: followCount },
+                  edge_followed_by: { count: followersCount },
+                  profile_pic_url_hd,
+                  username,
                 },
-                edge_followed_by: {
-                  count: followersCount
-                },
-                profile_pic_url_hd,
-                username
-              }
-            }
-          } = response?.data;
-          res.send(`<html lang="en">
+              },
+            } = response?.data;
+            res.send(`<html lang="en">
+                    <meta charset="UTF-8">
                     ${styles}
-                    ${body({ full_name, biography, followersCount, profile_pic_url_hd, username })}
-                </html>`
-          );
-          return resolve();
-        } catch (e) {
+                    ${body({
+                      full_name,
+                      biography,
+                      followersCount,
+                      profile_pic_url_hd,
+                      username,
+                    })}
+                </html>`);
+            return resolve();
+          } catch (e) {
+            console.warn(e);
+            res.send(
+              `<html> <p>Invalid username!</p> ${JSON.stringify(e)} </html>`
+            );
+            return resolve();
+          }
+        })
+        .catch((e) => {
           console.warn(e);
-          res.send(`<html> <p>Invalid username!</p> ${JSON.stringify(e)} </html>`);
+          res.send("<html> <p>Server Error, Raise an Issue!</p> </html>");
           return resolve();
-        }
-      }).catch(e => {
-        console.warn(e);
-        res.send('<html> <p>Server Error, Raise an Issue!</p> </html>');
-        return resolve();
-      });
-
-    }
-    else {
-      res.send('<html> <p>Username undefined!</p> </html>');
+        });
+    } else {
+      res.send("<html> <p>Username undefined!</p> </html>");
       return resolve();
     }
-  })
-}
+  });
+};
